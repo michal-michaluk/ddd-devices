@@ -14,8 +14,19 @@ public class DeviceConfigurationAssert {
         this.device = device;
     }
 
-    public static DeviceConfigurationAssert assertThat(Device actual) {
-        return new DeviceConfigurationAssert(actual.toDeviceConfiguration());
+    public static DeviceConfigurationAssert assertThat(DeviceEntity actual) {
+        Violations violations = actual.checkViolations();
+        boolean usable = violations.isValid() && actual.publicAccess;
+        Visibility visibility = new Visibility(usable, Visibility.ForCustomer.calculateForCustomer(usable, actual.showOnMap));
+        return new DeviceConfigurationAssert(new DeviceConfiguration(
+                actual.deviceId,
+                actual.getOwnership(),
+                actual.getLocation(),
+                actual.getOpeningHours(),
+                actual.getSettings(),
+                violations,
+                visibility
+        ));
     }
 
     public static DeviceConfigurationAssert assertThat(DeviceConfiguration actual) {

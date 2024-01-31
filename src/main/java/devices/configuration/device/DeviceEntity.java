@@ -17,7 +17,7 @@ import static devices.configuration.device.OpeningHours.OpeningTime.*;
 
 @Entity
 @Table(name = "device")
-class Device extends AbstractAggregateRoot<Device> {
+class DeviceEntity extends AbstractAggregateRoot<DeviceEntity> {
 
     @Getter
     @Id
@@ -56,71 +56,47 @@ class Device extends AbstractAggregateRoot<Device> {
     @JoinColumn(name = "device_id", referencedColumnName = "device_id")
     private List<OpeningHoursEntity> openingHours = new ArrayList<>();
 
-    static Device newDevice(String deviceId) {
-        Device device = new Device();
+    static DeviceEntity newDevice(String deviceId) {
+        DeviceEntity device = new DeviceEntity();
         device.deviceId = deviceId;
         return device;
     }
 
     void resetToDefaults() {
-        updateLocation(null);
-        updateOpeningHours(OpeningHours.alwaysOpened());
-        updateSettings(Settings.defaultSettings());
-    }
+        if (!Objects.equals(getLocation(), null)) {
+            if (null != null) {
+                this.street = ((Location) null).street();
+                this.houseNumber = ((Location) null).houseNumber();
+                this.city = ((Location) null).city();
+                this.postalCode = ((Location) null).postalCode();
+                this.state = ((Location) null).state();
+                this.country = ((Location) null).country();
+                this.longitude = ((Location) null).coordinates().longitude();
+                this.latitude = ((Location) null).coordinates().latitude();
 
-    void assignTo(Ownership ownership) {
-        Objects.requireNonNull(ownership);
-        if (!Objects.equals(getOwnership(), ownership)) {
-            this.operator = ownership.operator();
-            this.provider = ownership.provider();
-            registerEvent(new OwnershipUpdated(deviceId, getOwnership()));
+                registerEvent(new LocationUpdated(deviceId, getLocation()));
+            } else {
+                this.street = null;
+                this.houseNumber = null;
+                this.city = null;
+                this.postalCode = null;
+                this.state = null;
+                this.country = null;
+                this.longitude = null;
+                this.latitude = null;
 
-            if (ownership.isUnowned()) {
-                resetToDefaults();
+                registerEvent(new LocationUpdated(deviceId, getLocation()));
             }
         }
-    }
 
-    void updateLocation(Location location) {
-        if (Objects.equals(getLocation(), location)) {
-            return;
-        }
-
-        if (location != null) {
-            this.street = location.street();
-            this.houseNumber = location.houseNumber();
-            this.city = location.city();
-            this.postalCode = location.postalCode();
-            this.state = location.state();
-            this.country = location.country();
-            this.longitude = location.coordinates().longitude();
-            this.latitude = location.coordinates().latitude();
-
-            registerEvent(new LocationUpdated(deviceId, getLocation()));
-        } else {
-            this.street = null;
-            this.houseNumber = null;
-            this.city = null;
-            this.postalCode = null;
-            this.state = null;
-            this.country = null;
-            this.longitude = null;
-            this.latitude = null;
-
-            registerEvent(new LocationUpdated(deviceId, getLocation()));
-        }
-    }
-
-    void updateOpeningHours(OpeningHours openingHours) {
-        Objects.requireNonNull(openingHours);
-        if (!Objects.equals(getOpeningHours(), openingHours)) {
+        OpeningHours openingHours1 = OpeningHours.alwaysOpened();
+        Objects.requireNonNull(openingHours1);
+        if (!Objects.equals(getOpeningHours(), openingHours1)) {
             this.openingHours.clear();
-            this.openingHours.addAll(OpeningHoursEntity.of(deviceId, openingHours));
+            this.openingHours.addAll(OpeningHoursEntity.of(deviceId, openingHours1));
             registerEvent(new OpeningHoursUpdated(deviceId, getOpeningHours()));
         }
-    }
-
-    void updateSettings(Settings settings) {
+        Settings settings = Settings.defaultSettings();
         Objects.requireNonNull(settings);
         boolean changed = false;
         if (settings.autoStart() != null && !Objects.equals(this.autoStart, settings.autoStart())) {
@@ -151,33 +127,6 @@ class Device extends AbstractAggregateRoot<Device> {
         if (changed) {
             registerEvent(new SettingsUpdated(deviceId, getSettings()));
         }
-    }
-
-    private Violations checkViolations() {
-        return new Violations(
-                operator == null,
-                provider == null,
-                getLocation() == null,
-                showOnMap && getLocation() == null,
-                showOnMap && !publicAccess
-        );
-    }
-
-    DeviceConfiguration toDeviceConfiguration() {
-        Violations violations = checkViolations();
-        Visibility visibility = Visibility.basedOn(
-                violations.isValid() && this.publicAccess,
-                this.showOnMap
-        );
-        return new DeviceConfiguration(
-                deviceId,
-                getOwnership(),
-                getLocation(),
-                getOpeningHours(),
-                getSettings(),
-                violations,
-                visibility
-        );
     }
 
     private Ownership getOwnership() {

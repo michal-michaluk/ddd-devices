@@ -3,6 +3,8 @@ package devices.configuration.device;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import org.junit.jupiter.api.Test;
 
+import java.util.Objects;
+
 import static devices.configuration.device.DeviceConfigurationAssert.assertThat;
 import static devices.configuration.device.DeviceFixture.*;
 import static devices.configuration.device.Violations.builder;
@@ -11,7 +13,7 @@ class DeviceTest {
 
     @Test
     void newDeviceHasSettingsSetToDefaults() {
-        Device device = Device.newDevice(DeviceFixture.randomId());
+        DeviceEntity device = DeviceEntity.newDevice(DeviceFixture.randomId());
 
         assertThat(device)
                 .hasSettings(Settings.defaultSettings())
@@ -20,9 +22,39 @@ class DeviceTest {
 
     @Test
     void overrideSettings() {
-        Device device = givenDevice();
+        DeviceEntity device = givenDevice();
 
-        device.updateSettings(settingsForPublicDevice());
+        Settings settings = settingsForPublicDevice();
+        Objects.requireNonNull(settings);
+        boolean changed = false;
+        if (settings.autoStart() != null && !Objects.equals(device.autoStart, settings.autoStart())) {
+            device.autoStart = settings.autoStart();
+            changed = true;
+        }
+        if (settings.remoteControl() != null && !Objects.equals(device.remoteControl, settings.remoteControl())) {
+            device.remoteControl = settings.remoteControl();
+            changed = true;
+        }
+        if (settings.billing() != null && !Objects.equals(device.billing, settings.billing())) {
+            device.billing = settings.billing();
+            changed = true;
+        }
+        if (settings.reimbursement() != null && !Objects.equals(device.reimbursement, settings.reimbursement())) {
+            device.reimbursement = settings.reimbursement();
+            changed = true;
+        }
+        if (settings.showOnMap() != null && !Objects.equals(device.showOnMap, settings.showOnMap())) {
+            device.showOnMap = settings.showOnMap();
+            changed = true;
+        }
+        if (settings.publicAccess() != null && !Objects.equals(device.publicAccess, settings.publicAccess())) {
+            device.publicAccess = settings.publicAccess();
+            changed = true;
+        }
+
+        if (changed) {
+            device.registerEvent(new DomainEvent.SettingsUpdated(device.deviceId, device.getSettings()));
+        }
 
         assertThat(device)
                 .hasSettings(settingsForPublicDevice())
@@ -31,9 +63,39 @@ class DeviceTest {
 
     @Test
     void updateSingleValueInSettings() throws JsonProcessingException {
-        Device device = givenDevice();
+        DeviceEntity device = givenDevice();
 
-        device.updateSettings(settingsWithAutoStartOnly());
+        Settings settings = settingsWithAutoStartOnly();
+        Objects.requireNonNull(settings);
+        boolean changed = false;
+        if (settings.autoStart() != null && !Objects.equals(device.autoStart, settings.autoStart())) {
+            device.autoStart = settings.autoStart();
+            changed = true;
+        }
+        if (settings.remoteControl() != null && !Objects.equals(device.remoteControl, settings.remoteControl())) {
+            device.remoteControl = settings.remoteControl();
+            changed = true;
+        }
+        if (settings.billing() != null && !Objects.equals(device.billing, settings.billing())) {
+            device.billing = settings.billing();
+            changed = true;
+        }
+        if (settings.reimbursement() != null && !Objects.equals(device.reimbursement, settings.reimbursement())) {
+            device.reimbursement = settings.reimbursement();
+            changed = true;
+        }
+        if (settings.showOnMap() != null && !Objects.equals(device.showOnMap, settings.showOnMap())) {
+            device.showOnMap = settings.showOnMap();
+            changed = true;
+        }
+        if (settings.publicAccess() != null && !Objects.equals(device.publicAccess, settings.publicAccess())) {
+            device.publicAccess = settings.publicAccess();
+            changed = true;
+        }
+
+        if (changed) {
+            device.registerEvent(new DomainEvent.SettingsUpdated(device.deviceId, device.getSettings()));
+        }
 
         assertThat(device)
                 .hasSettings(Settings.defaultSettings().toBuilder()
@@ -43,10 +105,70 @@ class DeviceTest {
 
     @Test
     void mergeSettings() throws JsonProcessingException {
-        Device device = givenDevice();
+        DeviceEntity device = givenDevice();
 
-        device.updateSettings(settingsForPublicDevice());
-        device.updateSettings(settingsWithAutoStartOnly());
+        Settings settings1 = settingsForPublicDevice();
+        Objects.requireNonNull(settings1);
+        boolean changed1 = false;
+        if (settings1.autoStart() != null && !Objects.equals(device.autoStart, settings1.autoStart())) {
+            device.autoStart = settings1.autoStart();
+            changed1 = true;
+        }
+        if (settings1.remoteControl() != null && !Objects.equals(device.remoteControl, settings1.remoteControl())) {
+            device.remoteControl = settings1.remoteControl();
+            changed1 = true;
+        }
+        if (settings1.billing() != null && !Objects.equals(device.billing, settings1.billing())) {
+            device.billing = settings1.billing();
+            changed1 = true;
+        }
+        if (settings1.reimbursement() != null && !Objects.equals(device.reimbursement, settings1.reimbursement())) {
+            device.reimbursement = settings1.reimbursement();
+            changed1 = true;
+        }
+        if (settings1.showOnMap() != null && !Objects.equals(device.showOnMap, settings1.showOnMap())) {
+            device.showOnMap = settings1.showOnMap();
+            changed1 = true;
+        }
+        if (settings1.publicAccess() != null && !Objects.equals(device.publicAccess, settings1.publicAccess())) {
+            device.publicAccess = settings1.publicAccess();
+            changed1 = true;
+        }
+
+        if (changed1) {
+            device.registerEvent(new DomainEvent.SettingsUpdated(device.deviceId, device.getSettings()));
+        }
+        Settings settings = settingsWithAutoStartOnly();
+        Objects.requireNonNull(settings);
+        boolean changed = false;
+        if (settings.autoStart() != null && !Objects.equals(device.autoStart, settings.autoStart())) {
+            device.autoStart = settings.autoStart();
+            changed = true;
+        }
+        if (settings.remoteControl() != null && !Objects.equals(device.remoteControl, settings.remoteControl())) {
+            device.remoteControl = settings.remoteControl();
+            changed = true;
+        }
+        if (settings.billing() != null && !Objects.equals(device.billing, settings.billing())) {
+            device.billing = settings.billing();
+            changed = true;
+        }
+        if (settings.reimbursement() != null && !Objects.equals(device.reimbursement, settings.reimbursement())) {
+            device.reimbursement = settings.reimbursement();
+            changed = true;
+        }
+        if (settings.showOnMap() != null && !Objects.equals(device.showOnMap, settings.showOnMap())) {
+            device.showOnMap = settings.showOnMap();
+            changed = true;
+        }
+        if (settings.publicAccess() != null && !Objects.equals(device.publicAccess, settings.publicAccess())) {
+            device.publicAccess = settings.publicAccess();
+            changed = true;
+        }
+
+        if (changed) {
+            device.registerEvent(new DomainEvent.SettingsUpdated(device.deviceId, device.getSettings()));
+        }
 
         assertThat(device)
                 .hasSettings(Settings.builder()
@@ -62,7 +184,7 @@ class DeviceTest {
 
     @Test
     void newDeviceHasOwnershipSetToUnowned() {
-        Device device = Device.newDevice(DeviceFixture.randomId());
+        DeviceEntity device = DeviceEntity.newDevice(DeviceFixture.randomId());
 
         assertThat(device)
                 .hasOwnership(Ownership.unowned())
@@ -71,8 +193,18 @@ class DeviceTest {
 
     @Test
     void assignStationToOwner() {
-        Device device = givenDevice();
-        device.assignTo(someOtherOwnership());
+        DeviceEntity device = givenDevice();
+        Ownership ownership = someOtherOwnership();
+        Objects.requireNonNull(ownership);
+        if (!Objects.equals(device.getOwnership(), ownership)) {
+            device.operator = ownership.operator();
+            device.provider = ownership.provider();
+            device.registerEvent(new DomainEvent.OwnershipUpdated(device.deviceId, device.getOwnership()));
+
+            if (ownership.isUnowned()) {
+                device.resetToDefaults();
+            }
+        }
 
         assertThat(device)
                 .hasOwnership(someOtherOwnership())
@@ -81,9 +213,19 @@ class DeviceTest {
 
     @Test
     void resetOwnership() {
-        Device device = givenDevice();
+        DeviceEntity device = givenDevice();
 
-        device.assignTo(Ownership.unowned());
+        Ownership ownership = Ownership.unowned();
+        Objects.requireNonNull(ownership);
+        if (!Objects.equals(device.getOwnership(), ownership)) {
+            device.operator = ownership.operator();
+            device.provider = ownership.provider();
+            device.registerEvent(new DomainEvent.OwnershipUpdated(device.deviceId, device.getOwnership()));
+
+            if (ownership.isUnowned()) {
+                device.resetToDefaults();
+            }
+        }
 
         assertThat(device)
                 .hasOwnership(Ownership.unowned())
@@ -95,7 +237,7 @@ class DeviceTest {
 
     @Test
     void resetToDefaults() {
-        Device device = givenDevice();
+        DeviceEntity device = givenDevice();
         device.resetToDefaults();
 
         assertThat(device)
@@ -109,7 +251,7 @@ class DeviceTest {
 
     @Test
     void newDeviceHasNoLocation() {
-        Device device = Device.newDevice(DeviceFixture.randomId());
+        DeviceEntity device = DeviceEntity.newDevice(DeviceFixture.randomId());
 
         assertThat(device)
                 .hasLocation(null)
@@ -118,8 +260,33 @@ class DeviceTest {
 
     @Test
     void updateLocation() {
-        Device device = Device.newDevice(DeviceFixture.randomId());
-        device.updateLocation(location());
+        DeviceEntity device = DeviceEntity.newDevice(DeviceFixture.randomId());
+        Location location = location();
+        if (!Objects.equals(device.getLocation(), location)) {
+            if (location != null) {
+                device.street = location.street();
+                device.houseNumber = location.houseNumber();
+                device.city = location.city();
+                device.postalCode = location.postalCode();
+                device.state = location.state();
+                device.country = location.country();
+                device.longitude = location.coordinates().longitude();
+                device.latitude = location.coordinates().latitude();
+
+                device.registerEvent(new DomainEvent.LocationUpdated(device.deviceId, device.getLocation()));
+            } else {
+                device.street = null;
+                device.houseNumber = null;
+                device.city = null;
+                device.postalCode = null;
+                device.state = null;
+                device.country = null;
+                device.longitude = null;
+                device.latitude = null;
+
+                device.registerEvent(new DomainEvent.LocationUpdated(device.deviceId, device.getLocation()));
+            }
+        }
 
         assertThat(device)
                 .hasLocation(location())
@@ -131,8 +298,33 @@ class DeviceTest {
 
     @Test
     void overrideLocation() {
-        Device device = givenDevice();
-        device.updateLocation(someOtherLocation());
+        DeviceEntity device = givenDevice();
+        Location location = someOtherLocation();
+        if (!Objects.equals(device.getLocation(), location)) {
+            if (location != null) {
+                device.street = location.street();
+                device.houseNumber = location.houseNumber();
+                device.city = location.city();
+                device.postalCode = location.postalCode();
+                device.state = location.state();
+                device.country = location.country();
+                device.longitude = location.coordinates().longitude();
+                device.latitude = location.coordinates().latitude();
+
+                device.registerEvent(new DomainEvent.LocationUpdated(device.deviceId, device.getLocation()));
+            } else {
+                device.street = null;
+                device.houseNumber = null;
+                device.city = null;
+                device.postalCode = null;
+                device.state = null;
+                device.country = null;
+                device.longitude = null;
+                device.latitude = null;
+
+                device.registerEvent(new DomainEvent.LocationUpdated(device.deviceId, device.getLocation()));
+            }
+        }
 
         assertThat(device)
                 .hasLocation(someOtherLocation())
@@ -141,8 +333,32 @@ class DeviceTest {
 
     @Test
     void resetLocation() {
-        Device device = givenDevice();
-        device.updateLocation(null);
+        DeviceEntity device = givenDevice();
+        if (!Objects.equals(device.getLocation(), null)) {
+            if (null != null) {
+                device.street = ((Location) null).street();
+                device.houseNumber = ((Location) null).houseNumber();
+                device.city = ((Location) null).city();
+                device.postalCode = ((Location) null).postalCode();
+                device.state = ((Location) null).state();
+                device.country = ((Location) null).country();
+                device.longitude = ((Location) null).coordinates().longitude();
+                device.latitude = ((Location) null).coordinates().latitude();
+
+                device.registerEvent(new DomainEvent.LocationUpdated(device.deviceId, device.getLocation()));
+            } else {
+                device.street = null;
+                device.houseNumber = null;
+                device.city = null;
+                device.postalCode = null;
+                device.state = null;
+                device.country = null;
+                device.longitude = null;
+                device.latitude = null;
+
+                device.registerEvent(new DomainEvent.LocationUpdated(device.deviceId, device.getLocation()));
+            }
+        }
 
         assertThat(device)
                 .hasLocation(null)

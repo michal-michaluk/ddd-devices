@@ -20,7 +20,7 @@ import static devices.configuration.device.UpdateDevice.builder;
 
 class DeviceServiceTest {
 
-    final Map<String, Device> devices = new HashMap<>();
+    final Map<String, DeviceEntity> devices = new HashMap<>();
     final DeviceService service = new DeviceService(new FakeRepo());
 
     @Test
@@ -101,14 +101,14 @@ class DeviceServiceTest {
 
 
     private String givenDevice() {
-        Device device = DeviceFixture.givenDevice();
+        DeviceEntity device = DeviceFixture.givenDevice();
         devices.put(device.getDeviceId(), device);
         return device.getDeviceId();
     }
 
     class FakeRepo implements DeviceRepository {
         @Override
-        public Optional<Device> findById(String deviceId) {
+        public Optional<DeviceEntity> findById(String deviceId) {
             return Optional.ofNullable(devices.get(deviceId));
         }
 
@@ -118,28 +118,28 @@ class DeviceServiceTest {
         }
 
         @Override
-        public Device save(Device device) {
+        public DeviceEntity save(DeviceEntity device) {
             devices.put(device.getDeviceId(), device);
             return device;
         }
 
         @Override
-        public List<Device> findAll() {
+        public List<DeviceEntity> findAll() {
             return null;
         }
 
         @Override
-        public List<Device> findAll(Sort sort) {
+        public List<DeviceEntity> findAll(Sort sort) {
             return null;
         }
 
         @Override
-        public Page<Device> findAll(Pageable pageable) {
+        public Page<DeviceEntity> findAll(Pageable pageable) {
             return null;
         }
 
         @Override
-        public List<Device> findAllById(Iterable<String> strings) {
+        public List<DeviceEntity> findAllById(Iterable<String> strings) {
             return null;
         }
 
@@ -154,7 +154,7 @@ class DeviceServiceTest {
         }
 
         @Override
-        public void delete(Device entity) {
+        public void delete(DeviceEntity entity) {
 
         }
 
@@ -164,7 +164,7 @@ class DeviceServiceTest {
         }
 
         @Override
-        public void deleteAll(Iterable<? extends Device> entities) {
+        public void deleteAll(Iterable<? extends DeviceEntity> entities) {
 
         }
 
@@ -174,7 +174,7 @@ class DeviceServiceTest {
         }
 
         @Override
-        public <S extends Device> List<S> saveAll(Iterable<S> entities) {
+        public <S extends DeviceEntity> List<S> saveAll(Iterable<S> entities) {
             return null;
         }
 
@@ -184,17 +184,17 @@ class DeviceServiceTest {
         }
 
         @Override
-        public <S extends Device> S saveAndFlush(S entity) {
+        public <S extends DeviceEntity> S saveAndFlush(S entity) {
             return null;
         }
 
         @Override
-        public <S extends Device> List<S> saveAllAndFlush(Iterable<S> entities) {
+        public <S extends DeviceEntity> List<S> saveAllAndFlush(Iterable<S> entities) {
             return null;
         }
 
         @Override
-        public void deleteAllInBatch(Iterable<Device> entities) {
+        public void deleteAllInBatch(Iterable<DeviceEntity> entities) {
 
         }
 
@@ -209,52 +209,52 @@ class DeviceServiceTest {
         }
 
         @Override
-        public Device getOne(String s) {
+        public DeviceEntity getOne(String s) {
             return null;
         }
 
         @Override
-        public Device getById(String s) {
+        public DeviceEntity getById(String s) {
             return null;
         }
 
         @Override
-        public Device getReferenceById(String s) {
+        public DeviceEntity getReferenceById(String s) {
             return null;
         }
 
         @Override
-        public <S extends Device> Optional<S> findOne(Example<S> example) {
+        public <S extends DeviceEntity> Optional<S> findOne(Example<S> example) {
             return Optional.empty();
         }
 
         @Override
-        public <S extends Device> List<S> findAll(Example<S> example) {
+        public <S extends DeviceEntity> List<S> findAll(Example<S> example) {
             return null;
         }
 
         @Override
-        public <S extends Device> List<S> findAll(Example<S> example, Sort sort) {
+        public <S extends DeviceEntity> List<S> findAll(Example<S> example, Sort sort) {
             return null;
         }
 
         @Override
-        public <S extends Device> Page<S> findAll(Example<S> example, Pageable pageable) {
+        public <S extends DeviceEntity> Page<S> findAll(Example<S> example, Pageable pageable) {
             return null;
         }
 
         @Override
-        public <S extends Device> long count(Example<S> example) {
+        public <S extends DeviceEntity> long count(Example<S> example) {
             return 0;
         }
 
         @Override
-        public <S extends Device> boolean exists(Example<S> example) {
+        public <S extends DeviceEntity> boolean exists(Example<S> example) {
             return false;
         }
 
         @Override
-        public <S extends Device, R> R findBy(Example<S> example, Function<FluentQuery.FetchableFluentQuery<S>, R> queryFunction) {
+        public <S extends DeviceEntity, R> R findBy(Example<S> example, Function<FluentQuery.FetchableFluentQuery<S>, R> queryFunction) {
             return null;
         }
     }

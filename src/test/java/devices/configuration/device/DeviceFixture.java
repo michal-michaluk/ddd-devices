@@ -6,6 +6,7 @@ import org.intellij.lang.annotations.Language;
 import org.jetbrains.annotations.NotNull;
 
 import java.math.BigDecimal;
+import java.util.Objects;
 import java.util.UUID;
 
 public class DeviceFixture {
@@ -15,12 +16,84 @@ public class DeviceFixture {
     }
 
     @NotNull
-    public static Device givenDevice() {
-        Device device = Device.newDevice(randomId());
-        device.assignTo(ownership());
-        device.updateLocation(location());
-        device.updateOpeningHours(OpeningHours.alwaysOpened());
-        device.updateSettings(Settings.defaultSettings());
+    public static DeviceEntity givenDevice() {
+        DeviceEntity device = DeviceEntity.newDevice(randomId());
+        Ownership ownership = ownership();
+        Objects.requireNonNull(ownership);
+        if (!Objects.equals(device.getOwnership(), ownership)) {
+            device.operator = ownership.operator();
+            device.provider = ownership.provider();
+            device.registerEvent(new DomainEvent.OwnershipUpdated(device.deviceId, device.getOwnership()));
+
+            if (ownership.isUnowned()) {
+                device.resetToDefaults();
+            }
+        }
+        Location location = location();
+        if (!Objects.equals(device.getLocation(), location)) {
+            if (location != null) {
+                device.street = location.street();
+                device.houseNumber = location.houseNumber();
+                device.city = location.city();
+                device.postalCode = location.postalCode();
+                device.state = location.state();
+                device.country = location.country();
+                device.longitude = location.coordinates().longitude();
+                device.latitude = location.coordinates().latitude();
+
+                device.registerEvent(new DomainEvent.LocationUpdated(device.deviceId, device.getLocation()));
+            } else {
+                device.street = null;
+                device.houseNumber = null;
+                device.city = null;
+                device.postalCode = null;
+                device.state = null;
+                device.country = null;
+                device.longitude = null;
+                device.latitude = null;
+
+                device.registerEvent(new DomainEvent.LocationUpdated(device.deviceId, device.getLocation()));
+            }
+        }
+
+        OpeningHours openingHours = OpeningHours.alwaysOpened();
+        Objects.requireNonNull(openingHours);
+        if (!Objects.equals(device.getOpeningHours(), openingHours)) {
+            device.openingHours.clear();
+            device.openingHours.addAll(DeviceEntity.OpeningHoursEntity.of(device.deviceId, openingHours));
+            device.registerEvent(new DomainEvent.OpeningHoursUpdated(device.deviceId, device.getOpeningHours()));
+        }
+        Settings settings = Settings.defaultSettings();
+        Objects.requireNonNull(settings);
+        boolean changed = false;
+        if (settings.autoStart() != null && !Objects.equals(device.autoStart, settings.autoStart())) {
+            device.autoStart = settings.autoStart();
+            changed = true;
+        }
+        if (settings.remoteControl() != null && !Objects.equals(device.remoteControl, settings.remoteControl())) {
+            device.remoteControl = settings.remoteControl();
+            changed = true;
+        }
+        if (settings.billing() != null && !Objects.equals(device.billing, settings.billing())) {
+            device.billing = settings.billing();
+            changed = true;
+        }
+        if (settings.reimbursement() != null && !Objects.equals(device.reimbursement, settings.reimbursement())) {
+            device.reimbursement = settings.reimbursement();
+            changed = true;
+        }
+        if (settings.showOnMap() != null && !Objects.equals(device.showOnMap, settings.showOnMap())) {
+            device.showOnMap = settings.showOnMap();
+            changed = true;
+        }
+        if (settings.publicAccess() != null && !Objects.equals(device.publicAccess, settings.publicAccess())) {
+            device.publicAccess = settings.publicAccess();
+            changed = true;
+        }
+
+        if (changed) {
+            device.registerEvent(new DomainEvent.SettingsUpdated(device.deviceId, device.getSettings()));
+        }
         device.clearEvents();
         return device;
     }
@@ -39,7 +112,7 @@ public class DeviceFixture {
                 OpeningHours.alwaysOpened(),
                 Settings.defaultSettings(),
                 Violations.builder().build(),
-                Visibility.basedOn(true, false)
+                new Visibility(true, Visibility.ForCustomer.calculateForCustomer(true, false))
         );
     }
 
@@ -105,12 +178,84 @@ public class DeviceFixture {
                 .build();
     }
 
-    public static Device givenStepByStepConfiguredDevice() {
-        Device device = Device.newDevice(randomId());
-        device.assignTo(ownership());
-        device.updateLocation(location());
-        device.updateOpeningHours(OpeningHours.alwaysOpened());
-        device.updateSettings(Settings.defaultSettings());
+    public static DeviceEntity givenStepByStepConfiguredDevice() {
+        DeviceEntity device = DeviceEntity.newDevice(randomId());
+        Ownership ownership = ownership();
+        Objects.requireNonNull(ownership);
+        if (!Objects.equals(device.getOwnership(), ownership)) {
+            device.operator = ownership.operator();
+            device.provider = ownership.provider();
+            device.registerEvent(new DomainEvent.OwnershipUpdated(device.deviceId, device.getOwnership()));
+
+            if (ownership.isUnowned()) {
+                device.resetToDefaults();
+            }
+        }
+        Location location = location();
+        if (!Objects.equals(device.getLocation(), location)) {
+            if (location != null) {
+                device.street = location.street();
+                device.houseNumber = location.houseNumber();
+                device.city = location.city();
+                device.postalCode = location.postalCode();
+                device.state = location.state();
+                device.country = location.country();
+                device.longitude = location.coordinates().longitude();
+                device.latitude = location.coordinates().latitude();
+
+                device.registerEvent(new DomainEvent.LocationUpdated(device.deviceId, device.getLocation()));
+            } else {
+                device.street = null;
+                device.houseNumber = null;
+                device.city = null;
+                device.postalCode = null;
+                device.state = null;
+                device.country = null;
+                device.longitude = null;
+                device.latitude = null;
+
+                device.registerEvent(new DomainEvent.LocationUpdated(device.deviceId, device.getLocation()));
+            }
+        }
+
+        OpeningHours openingHours = OpeningHours.alwaysOpened();
+        Objects.requireNonNull(openingHours);
+        if (!Objects.equals(device.getOpeningHours(), openingHours)) {
+            device.openingHours.clear();
+            device.openingHours.addAll(DeviceEntity.OpeningHoursEntity.of(device.deviceId, openingHours));
+            device.registerEvent(new DomainEvent.OpeningHoursUpdated(device.deviceId, device.getOpeningHours()));
+        }
+        Settings settings = Settings.defaultSettings();
+        Objects.requireNonNull(settings);
+        boolean changed = false;
+        if (settings.autoStart() != null && !Objects.equals(device.autoStart, settings.autoStart())) {
+            device.autoStart = settings.autoStart();
+            changed = true;
+        }
+        if (settings.remoteControl() != null && !Objects.equals(device.remoteControl, settings.remoteControl())) {
+            device.remoteControl = settings.remoteControl();
+            changed = true;
+        }
+        if (settings.billing() != null && !Objects.equals(device.billing, settings.billing())) {
+            device.billing = settings.billing();
+            changed = true;
+        }
+        if (settings.reimbursement() != null && !Objects.equals(device.reimbursement, settings.reimbursement())) {
+            device.reimbursement = settings.reimbursement();
+            changed = true;
+        }
+        if (settings.showOnMap() != null && !Objects.equals(device.showOnMap, settings.showOnMap())) {
+            device.showOnMap = settings.showOnMap();
+            changed = true;
+        }
+        if (settings.publicAccess() != null && !Objects.equals(device.publicAccess, settings.publicAccess())) {
+            device.publicAccess = settings.publicAccess();
+            changed = true;
+        }
+
+        if (changed) {
+            device.registerEvent(new DomainEvent.SettingsUpdated(device.deviceId, device.getSettings()));
+        }
         return device;
     }
 

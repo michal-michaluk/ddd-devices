@@ -19,12 +19,25 @@ class DeviceRepositoryTest {
 
     @Test
     void saveAndGetDevice() {
-        Device saved = DeviceFixture.givenDevice();
+        DeviceEntity saved = DeviceFixture.givenDevice();
         transactional(() -> repository.save(saved));
-        Optional<Device> read = transactional(() -> repository.findById(saved.getDeviceId()));
+        Optional<DeviceEntity> read = transactional(() -> repository.findById(saved.getDeviceId()));
 
         assertThat(read).isExactlyLike(saved);
-        assertThat(read.map(Device::toDeviceConfiguration)).hasFieldsLike("""
+        assertThat(read.map(device -> {
+            Violations violations = device.checkViolations();
+            boolean usable = violations.isValid() && device.publicAccess;
+            Visibility visibility = new Visibility(usable, Visibility.ForCustomer.calculateForCustomer(usable, device.showOnMap));
+            return new DeviceConfiguration(
+                    device.deviceId,
+                    device.getOwnership(),
+                    device.getLocation(),
+                    device.getOpeningHours(),
+                    device.getSettings(),
+                    violations,
+                    visibility
+            );
+        })).hasFieldsLike("""
                 {
                   "ownership": {
                     "operator": "Devicex.nl",
